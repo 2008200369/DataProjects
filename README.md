@@ -1,4 +1,4 @@
-# Data_analysis_projects
+# Data Analysis Projects
 
 1. Candy Crush Difficulty Level. 
 
