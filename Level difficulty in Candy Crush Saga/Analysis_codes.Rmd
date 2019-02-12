@@ -4,7 +4,6 @@ author: "Tong Shen"
 date: "February 6, 2019"
 output:
   pdf_document: default
-  html_document: default
 ---
 ```{r message=FALSE, warning=FALSE}
 # Loading in packages
