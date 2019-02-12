@@ -1,0 +1,74 @@
+---
+title: "Level difficulty in Candy Crush"
+author: "Tong Shen"
+date: "February 6, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r message=FALSE, warning=FALSE}
+# Loading in packages
+library(tidyverse)
+
+# Reading in the data
+data <- read_csv("candy_crush.csv")
+```
+
+
+```{r}
+# Printing out the first couple of rows
+head(data)
+summary(data)
+
+#checking in the dataset
+total_player<-length(unique(data$player_id))
+range<-range(data$dt)
+paste("The total number of players is", total_player)
+paste("The period for which we have the data is from", min(range), "to", max(range))
+```
+```{r}
+# Calculating level difficulty
+difficulty <- data %>%
+  group_by(level) %>%
+  summarise(attempts= sum(num_attempts),total_win= sum(num_success)) %>%
+  mutate(p_win = total_win/attempts)
+difficulty
+```
+
+```{r}
+# Plotting the level difficulty profile with points and a 10% dashed line 
+difficulty %>% ggplot(aes(x = level, y = p_win))+
+ geom_line()+
+scale_x_continuous(breaks = 1:15) +
+scale_y_continuous(labels = scales::percent) +
+geom_point()+
+geom_hline(yintercept = 0.1,linetype = 2)
+
+
+
+```
+
+```{r}
+# Computing the standard error of p_win for each level
+difficulty <- difficulty %>%
+    mutate(error = sqrt(p_win*(1-p_win)/attempts))
+difficulty
+```
+
+```{r}
+# Adding standard error bars
+difficulty %>% ggplot(aes(x = level, y = p_win))+
+ geom_line()+
+scale_x_continuous(breaks = 1:15) +
+scale_y_continuous(labels = scales::percent) +
+geom_point()+
+geom_hline(yintercept = 0.1,linetype = 2) +
+geom_errorbar(aes(ymin = p_win - error, ymax = p_win + error), width = 0.5)
+```
+
+```{r}
+# The probability of completing the episode without losing a single time
+prod(difficulty$p_win)
+```
+
+This means that the game designer does not need to worry that the player might complete the episode in one attempt.
